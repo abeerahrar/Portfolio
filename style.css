@@ -1,0 +1,472 @@
+/* ==========================================================================
+   1. VARIABLES & THEME SETUP
+   ========================================================================== */
+:root {
+    --bg-color: #1A1A1A;
+    --text-primary: #FFFFFF;
+    --text-secondary: #A1A1AA;
+    --accent: #F8B4C9; 
+    --star-color: #FFFFFF;
+    --cloud-color: transparent;
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --header-bg-rgb: 26, 26, 26;
+}
+
+[data-theme="light"] {
+    --bg-color: #FAFAF9;
+    --text-primary: #121212;
+    --text-secondary: #52525B;
+    --star-color: transparent;
+    --cloud-color: transparent;
+    --card-bg: #FFFFFF;
+    --card-border: #E4E4E7;
+    --accent-text: var(--accent); 
+}
+
+/* ==========================================================================
+   2. GLOBAL RESET & BODY
+   ========================================================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Figtree', sans-serif;
+    transition: background 0.6s ease;
+    overflow-x: hidden;
+    /* Pushes content down so the fixed header doesn't cover it */
+    padding-top: 80px !important;
+}
+
+p { line-height: 1.8; margin-bottom: 1.5rem; }
+
+#starCanvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
+
+/* Global Section Spacing & Overlap Fixes */
+section, #about, main {
+    scroll-margin-top: 80px;
+    padding: 80px 20px;       /* Gives it a clean, uniform breathing room */
+    min-height: auto;         /* FIX: Removes the forced giant empty screen spaces */
+}
+
+.section-container {
+    max-width: 1200px;
+    margin: 100px auto;
+    padding: 0 2rem;
+}
+
+.section-title {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-weight: bold;
+    font-size: 3rem;
+    color: var(--text-primary); 
+    margin-bottom: 2.5rem;
+    text-align: left;
+}
+
+.prompt { color: var(--text-secondary); margin-right: 12px; }
+.pink-text { color: var(--accent); }
+
+
+/* ==========================================================================
+   3. HEADER: CENTERED NAVIGATION (CLEAN BLEND)
+   ========================================================================== */
+header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 70px !important;
+    
+    /* Neutral dark background - no blue tint */
+    background: rgba(20, 20, 20, 0.8) !important; 
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px);
+    
+    /* REMOVED ALL LINES/BORDERS */
+    border: none !important;
+    
+    display: flex !important;
+    justify-content: center !important; 
+    align-items: center !important;
+    
+    z-index: 10000 !important;
+    padding: 0 40px !important;
+}
+
+/* THE NAV LINKS */
+.nav-links {
+    display: flex !important;
+    gap: 40px !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.nav-links a {
+    text-decoration: none !important;
+    /* DEFAULT TEXT COLOR: WHITE */
+    color: #FFFFFF !important; 
+    font-family: 'Consolas', monospace;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 1.2px !important;
+    text-transform: uppercase !important;
+    transition: 0.3s;
+}
+
+/* ACTIVE & HOVER: PINK */
+.nav-links a:hover, 
+.nav-links a.active {
+    color: var(--accent) !important; /* This is your pink #F8B4C9 */
+}
+
+/* Remove the underline line as well */
+.nav-links a.active {
+    border-bottom: none !important;
+    padding-bottom: 0;
+}
+
+/* THE THEME SWITCH WRAPPER (Far Right) */
+.theme-switch-wrapper {
+    position: absolute !important;
+    right: 40px !important;
+    background: transparent !important;
+}
+
+
+/* ==========================================================================
+   4. THEME SWITCH (PROFESSIONAL DIE-CUT)
+   ========================================================================== */
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.theme-switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    transition: 0.4s;
+    border-radius: 30px;
+}
+
+.ball {
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 2px;
+    background-color: var(--accent) !important;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* The icons act as the "holes" */
+.ball .shape {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    fill: var(--bg-color); /* Matches background to look like a hole */
+    color: var(--bg-color); /* For the sun rays */
+    transition: all 0.3s ease;
+}
+
+/* Dark Mode Logic */
+.ball .sun { opacity: 0; transform: scale(0); }
+.ball .moon { opacity: 1; transform: scale(1); }
+
+/* Light Mode Logic */
+[data-theme="light"] .ball .sun { opacity: 1; transform: scale(1); }
+[data-theme="light"] .ball .moon { opacity: 0; transform: scale(0); }
+
+input:checked + .slider .ball {
+    transform: translateX(24px);
+}
+
+/* ==========================================================================
+   5. HERO SECTION
+   ========================================================================== */
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10%;
+    gap: 4rem;
+}
+
+
+.hero-left { flex: 1; display: flex; flex-direction: column; align-items: flex-start; }
+
+.name {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-weight: bold;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    color: var(--accent);
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.hero-tagline {
+    font-family: 'Figtree', sans-serif;
+    font-weight: 400;
+    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+}
+
+.explore-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    padding: 1rem 2.5rem;
+    border-radius: 100px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.explore-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(248, 180, 201, 0.2);
+}
+
+.hero-right { flex: 1; display: flex; justify-content: center; }
+.profile-circle {
+    width: clamp(280px, 35vw, 420px);
+    height: clamp(280px, 35vw, 420px);
+    border-radius: 50%;
+    border: 12px solid var(--accent);
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.profile-img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ==========================================================================
+   6. GLOBAL CARD STYLES & JUMP ANIMATION
+   ========================================================================== */
+.about-card, .edu-card, .project-card, .paper-horizontal-card, .skill-card {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.4s ease !important;
+    overflow: hidden;
+}
+
+/* The Jump Effect (Consolidated) */
+.about-card:hover, 
+.edu-item:hover .edu-card, 
+.project-card:hover, 
+.skill-card:hover, 
+.paper-horizontal-card:hover {
+    transform: translateY(-10px) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 15px 30px rgba(248, 180, 201, 0.15) !important;
+    z-index: 10;
+}
+
+/* Card Stars */
+.card-star {
+    position: absolute;
+    font-size: 1.2rem;
+    color: var(--accent);
+    opacity: 0.2;
+    transition: all 0.5s ease;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.about-card:hover .card-star, 
+.edu-item:hover .card-star, 
+.project-card:hover .card-star, 
+.paper-horizontal-card:hover .card-star,
+.skill-card:hover .card-star {
+    opacity: 1;
+    transform: rotate(90deg) scale(1.2);
+}
+
+/* Star Positions */
+.about-card .card-star, .paper-horizontal-card .card-star, .skill-card .card-star { top: 25px; right: 25px; }
+.edu-card .card-star, .project-card .card-star { bottom: 25px; right: 25px; top: auto; }
+
+/* ==========================================================================
+   7. SECTIONS: ABOUT & EDUCATION
+   ========================================================================== */
+/* About */
+.about-flex { display: flex; gap: 2rem; align-items: stretch; width: 100%; }
+.about-card { padding: 2.5rem; }
+.intro-card { flex: 1.5; }
+.intro-card p { font-size: 1.25rem; color: var(--text-primary); }
+.stats-card { flex: 1; display: flex; flex-direction: column; gap: 1.5rem; }
+.stat-label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--accent); margin-bottom: 0.2rem; }
+.stats-item p { font-size: 1.1rem; font-weight: 500; margin-bottom: 0; }
+
+/* Education */
+.education-timeline { position: relative; padding-left: 3rem; margin-top: 3rem; display: flex; flex-direction: column; gap: 2.5rem; }
+.education-timeline::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: rgba(255, 255, 255, 0.1); z-index: 1; }
+.edu-item { position: relative; width: 100%; }
+.edu-dot { position: absolute; left: -44px; top: 35px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg-color); border: 2px solid var(--text-secondary); z-index: 2; transition: all 0.4s ease; }
+.edu-item:hover .edu-dot { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 15px var(--accent); transform: scale(1.2); }
+.edu-card { padding: 2.5rem; padding-bottom: 4rem; } 
+.edu-date { font-family: 'Consolas', monospace; font-size: 0.8rem; color: var(--accent); background: rgba(248, 180, 201, 0.1); padding: 4px 12px; border-radius: 20px; }
+.edu-item:hover .edu-date { background: var(--accent); color: #000; }
+.edu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+.edu-school { color: var(--accent); font-weight: 600; }
+.edu-desc { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 0 !important; }
+
+/* ==========================================================================
+   8. SECTIONS: PROJECTS & PAPERS
+   ========================================================================== */
+.projects-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+    gap: 2rem; 
+    margin-top: 3rem; 
+}
+
+.project-card { 
+    padding: 2.5rem; 
+    padding-bottom: 5rem; 
+    min-height: 350px; 
+    display: flex; flex-direction: column; justify-content: flex-start;
+}
+.project-card h3 { font-size: 1.5rem; color: var(--text-primary); margin-bottom: 12px; }
+.project-card p { font-size: 1rem; color: var(--text-secondary); margin-bottom: 15px; }
+
+.tech-stack { display: flex; gap: 0.8rem; margin: 1rem 0; flex-wrap: wrap; }
+.tech-stack span { font-size: 0.75rem; font-family: 'Consolas', monospace; background: rgba(248, 180, 201, 0.1); color: var(--accent); padding: 4px 10px; border-radius: 5px; }
+
+.papers-list { display: flex; flex-direction: column; gap: 25px; margin-top: 30px; }
+.paper-horizontal-card { padding: 2.5rem !important; }
+.paper-horizontal-card h3 { font-size: 1.5rem; color: var(--text-primary); margin-bottom: 12px; }
+.paper-horizontal-card p { font-size: 1rem; color: var(--text-secondary); }
+
+.github-link, .paper-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    text-decoration: none; color: var(--text-secondary);
+    font-size: 0.8rem; font-family: 'Consolas', monospace; font-weight: 700;
+    transition: all 0.3s ease; margin-top: auto;
+}
+.github-link:hover, .paper-btn:hover { color: var(--accent); transform: translateX(5px); }
+
+/* ==========================================================================
+   9. SECTIONS: SKILLS (FOLDERS)
+   ========================================================================== */
+.skills-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 2.5rem; row-gap: 4rem; 
+    margin-top: 3rem; width: 100%;
+}
+.core-card-full { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+
+.skill-card {
+    padding: 3.5rem 2rem;
+    display: flex; flex-direction: column; align-items: center;
+    overflow: visible; 
+}
+
+/* Folder Animation */
+.folder-container { position: relative; width: 160px; height: 120px; margin-bottom: 2rem; display: flex; justify-content: center; align-items: flex-end; }
+.folder-back { position: absolute; bottom: 10px; width: 110px; height: 80px; background: var(--accent); opacity: 0.5; border-radius: 12px; z-index: 1; }
+.folder-front { position: absolute; bottom: 0; width: 120px; height: 80px; background: var(--accent); border-radius: 12px; z-index: 3; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+.folder-front::before { content: ''; position: absolute; top: -10px; left: 0; width: 45px; height: 20px; background: var(--accent); border-radius: 8px 8px 0 0; }
+
+.icon-fan { position: absolute; bottom: 50px; display: flex; justify-content: center; width: 100%; z-index: 2; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.icon-fan img { width: 32px; height: 32px; margin: 0 -10px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); transition: all 0.4s ease; }
+.skill-card:hover .icon-fan { transform: translateY(-40px); }
+.skill-card:hover .icon-fan img { margin: 0 5px; }
+
+.pill-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 15px; }
+.skill-pill { font-size: 0.8rem; font-family: 'Consolas', monospace; background: rgba(248, 180, 201, 0.1); color: var(--accent); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(248, 180, 201, 0.3); }
+
+/* ==========================================================================
+   10. SECTIONS: CONTACT & FOOTER
+   ========================================================================== */
+.contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
+
+.contact-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2rem; border-radius: 20px; text-align: center; transition: 0.3s;
+}
+.contact-item:hover { background: rgba(248, 180, 201, 0.1); border-color: var(--accent); }
+.contact-label { display: block; font-size: 0.7rem; letter-spacing: 2px; color: #888; margin-bottom: 0.5rem; }
+.contact-link { color: white; text-decoration: none; font-weight: 600; }
+
+.footer-text { text-align: center; margin-top: 5rem; font-size: 0.8rem; color: #444; letter-spacing: 3px; }
+
+.star-container { display: flex; justify-content: center; margin-top: 4rem; }
+.glow-star { font-size: 2.5rem; color: rgba(248, 180, 201, 0.2); cursor: pointer; transition: 0.5s ease; filter: blur(1px); }
+.glow-star:hover { color: var(--accent); transform: scale(1.4) rotate(144deg); filter: blur(0px) drop-shadow(0 0 15px var(--accent)); }
+
+/* ==========================================================================
+   11. LIGHT MODE SPECIFIC OVERRIDES
+   ========================================================================== */
+[data-theme="light"] {
+    --header-bg-rgb: 250, 250, 249; /* Updates the blend color to your light bg */
+}
+
+[data-theme="light"] header { 
+    background: rgba(var(--header-bg-rgb), 0.8) !important; 
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important; 
+}
+
+[data-theme="light"] .nav-links a {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="light"] .slider { 
+    background-color: #FFFFFF; 
+    border-color: var(--accent); 
+}
+
+[data-theme="light"] .contact-link, 
+[data-theme="light"] .nav-links a:hover, 
+[data-theme="light"] .nav-links a.active, 
+[data-theme="light"] .edu-school { 
+    color: var(--accent) !important;       
+}
+
+[data-theme="light"] .toggle-btn { background: var(--accent); color: #FFFFFF; }
+[data-theme="light"] .education-timeline::before { background: rgba(0, 0, 0, 0.1); }
+[data-theme="light"] .edu-dot { background: var(--bg-color); border-color: var(--text-secondary); }
+[data-theme="light"] .edu-item:hover .edu-dot { background: var(--accent); border-color: var(--accent); }
+
+/* Contact Items in Light Mode */
+[data-theme="light"] .contact-item {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--accent) !important;
+    color: var(--text-primary) !important;
+    box-shadow: none;
+}
+[data-theme="light"] .contact-item:hover { box-shadow: 0 0 10px rgba(248, 180, 201, 0.4); transform: translateY(-2px); }
+[data-theme="light"] .contact-link { color: var(--text-secondary); }
+[data-theme="light"] .contact-link:hover { color: var(--accent); }
+
+/* ==========================================================================
+   12. MOBILE RESPONSIVE
+   ========================================================================== */
+@media (max-width: 900px) {
+    .hero { flex-direction: column; text-align: center; padding-top: 120px; }
+    .hero-left { align-items: center; }
+    .about-flex { flex-direction: column; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .core-card-full { grid-column: auto; }
+    .nav-links { gap: 20px !important; }
+}
