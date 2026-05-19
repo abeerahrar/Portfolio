@@ -197,17 +197,17 @@ input:checked + .slider .ball {
     display: flex;
     align-items: center;
     justify-content: center; 
-    padding: 0 20px;         
+    padding: 0 20px;      
     position: relative;
     overflow: hidden;
 }
 
-.hero-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;    
-    text-align: center;      
-    max-width: 800px;
+.hero-center { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;  
+    text-align: center;     
+    max-width: 800px;        
 }
 
 .name {
@@ -217,7 +217,7 @@ input:checked + .slider .ball {
     color: var(--accent);
     letter-spacing: -0.04em;
     line-height: 0.9;
-    margin-bottom: 1.5rem; 
+    margin-bottom: 1.5rem;   
 }
 
 .hero-tagline {
